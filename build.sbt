@@ -24,7 +24,8 @@ libraryDependencies ++= Seq(
   "org.http4s" %% "http4s-blaze-server" % http4sVersion,
   "org.http4s" %% "http4s-blaze-client" % http4sVersion,
   "org.http4s" %% "http4s-argonaut" % http4sVersion,
-  "org.typelevel" %% "cats-effect" % "1.2.0")
+  "org.typelevel" %% "cats-effect" % "1.2.0",
+  "com.typesafe.play" %% "play-json" % "2.7.1")
 
 
 scalacOptions ++= Seq("-Ypartial-unification")
