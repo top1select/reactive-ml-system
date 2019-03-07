@@ -21,9 +21,13 @@ object KafkaDataIngester {
     val dataDir = loaderConfig.data_dir
     val timeInterval = Duration(loaderConfig.publish_interval)
     val batchSize = loaderConfig.batch_size
+
     println(s"Starting data ingester \n Brokers : $brokers, topic : " +
       s"${kafkaConfig.topic}, directory : $dataDir, timeinterval $timeInterval, " +
       s"batch size $batchSize")
+
+    val kafka = KafkaLocalServer(true)
+    kafka.start()
 
     val ingester = KafkaDataIngester(brokers, batchSize, timeInterval)
 
@@ -79,9 +83,11 @@ class KafkaDataIngester(brokers: String, batchSize: Int, timeInterval : Duration
         if (numrec % 100 == 0)
           println(s"Submitted $numrec records")
       })
+
       if (batch.size > 0)
         sender.batchWriteValue(topic, batch)
       println(s"Submitted $numrec records")
+
     }
   }
 }

@@ -26,8 +26,7 @@ object DataConvertor {
     val report = RawWeatherData(string.split(","))
 
     // serialise to Protobuf
-    val bytes  = report.toPB
-
+    val bytes = report.toPB
     bytes
   }
 
