@@ -8,7 +8,6 @@ import org.apache.spark.mllib.stat.Statistics
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 
-import scala.util.Random
 
 object FeatureGeneration extends App {
 
@@ -16,20 +15,20 @@ object FeatureGeneration extends App {
   val session = SparkSession.builder.appName("Feature Generation").getOrCreate()
   import session.implicits._
 
-  case class Squawk(id: Int, text: String)
+  case class Tweet(id: Int, text: String)
 
-  // Input data: Each row is a 140 character or less squawk
-  val squawks = Seq(Squawk(123, "Clouds sure make it hard to look on the bright side of things."),
-    Squawk(124, "Who really cares who gets the worm?  I'm fine with sleeping in."),
-    Squawk(125, "Why don't french fries grow on trees?"))
+  // Input data: Each row is a 140 character or less tweet
+  val tweets = Seq(Tweet(123, "Clouds sure make it hard to look on the bright side of things."),
+    Tweet(124, "Who really cares who gets the worm?  I'm fine with sleeping in."),
+    Tweet(125, "Why don't french fries grow on trees?"))
 
-  val squawksDF = session.createDataFrame(squawks).toDF("squawkId", "squawk")
+  val tweetsDF = session.createDataFrame(tweets).toDF("tweetId", "tweet")
 
-  val tokenizer = new Tokenizer().setInputCol("squawk").setOutputCol("words")
+  val tokenizer = new Tokenizer().setInputCol("tweet").setOutputCol("words")
 
-  val tokenized = tokenizer.transform(squawksDF)
+  val tokenized = tokenizer.transform(tweetsDF)
 
-  tokenized.select("words","squawkId").show()
+  tokenized.select("words","tweetId").show()
 
   trait FeatureType[V] {
     val name: String
@@ -60,7 +59,7 @@ object FeatureGeneration extends App {
   val pipeline = new Pipeline()
     .setStages(Array(tokenizer, hashingTF))
 
-  val pipelineHashed = pipeline.fit(squawksDF)
+  val pipelineHashed = pipeline.fit(tweetsDF)
 
   println(pipelineHashed.getClass)
 
@@ -157,93 +156,69 @@ object FeatureGeneration extends App {
     pValues(topK) < cutOff
   }
 
-  trait Generator[V] {
-    def generate(squawk: Squawk): Feature[V]
-  }
 
-  object SquawkLengthCategory extends Generator[Int] {
+  object TweetLengthCategory extends Generator[Int] {
 
-    val ModerateSquawkThreshold = 47
-    val LongSquawkThreshold = 94
+    val ModerateTweetThreshold = 47
+    val LongTweetThreshold = 94
 
-    private def extract(squawk: Squawk): IntFeature = {
-      IntFeature("squakLength", squawk.text.length)
+    private def extract(tweet: Tweet): IntFeature = {
+      IntFeature("squakLength", tweet.text.length)
 
     }
 
     private def transform(lengthFeature: IntFeature): IntFeature = {
-      val squawkLengthCategory = lengthFeature match {
-        case IntFeature(_, length) if length < ModerateSquawkThreshold => 1
-        case IntFeature(_, length) if length < LongSquawkThreshold => 2
+      val tweetLengthCategory = lengthFeature match {
+        case IntFeature(_, length) if length < ModerateTweetThreshold => 1
+        case IntFeature(_, length) if length < LongTweetThreshold => 2
         case _ => 3
       }
 
-      IntFeature("squawkLengthFeature", squawkLengthCategory)
+      IntFeature("tweetLengthFeature", tweetLengthCategory)
     }
 
-    override def generate(squawk: Squawk): IntFeature = {
-      transform(extract(squawk))
+    def generate(tweet: Tweet): IntFeature = {
+      transform(extract(tweet))
     }
   }
 
-  object CategoricalTransforms {
 
-    def categorize(thresholds: List[Int]): (IntFeature) => IntFeature = {
-      (rawFeature: IntFeature) => {
-        IntFeature("categorized-" + rawFeature.name,
-          thresholds.sorted
-        .zipWithIndex
-        .find {
-          case (threshold, i) => rawFeature.value < threshold
-        }.getOrElse((None, -1))
-        ._2)
-      }
-    }
+  object TweetLengthCategoryRefactored extends Generator[Int] {
 
-  }
-
-  object SquawkLengthCategoryRefactored extends Generator[Int] {
-
-    import com.reactivemachinelearning.feature.FeatureGeneration.CategoricalTransforms.categorize
+    import com.reactivemachinelearning.feature.CategoricalTransforms.categorize
 
     val Thresholds = List(47, 92, 141)
 
-    private def extract(squawk: Squawk): IntFeature = {
-      IntFeature("squawkLength", squawk.text.length)
+    private def extract(tweet: Tweet): IntFeature = {
+      IntFeature("tweetLength", tweet.text.length)
     }
 
     private def transform(lengthFeature: IntFeature): IntFeature = {
-      val squawkLengthCategory = categorize(Thresholds)(lengthFeature)
-      IntFeature("squawkLengthCategory", squawkLengthCategory.value)
+      val tweetLengthCategory = categorize(Thresholds)(lengthFeature)
+      IntFeature("tweetLengthCategory", tweetLengthCategory.value)
     }
 
-    def generate(squawk: Squawk): IntFeature = {
-      transform(extract(squawk))
+    def generate(tweet: Tweet): IntFeature = {
+      transform(extract(tweet))
     }
 
   }
 
-  trait StubGenerator extends Generator[Int] {
-    def generate(squawk: Squawk) ={
-      IntFeature("dummyFeature", Random.nextInt())
-    }
-  }
-
-  object SquawkLanguage extends StubGenerator {}
+  object TweetLanguage extends StubGenerator {}
 
   object HasImage extends StubGenerator {}
 
   object UserData extends  StubGenerator {}
 
-  val featureGenerators = Set(SquawkLanguage, HasImage, UserData)
+  val featureGenerators = Set(TweetLanguage, HasImage, UserData)
 
   object GlobalUserData extends StubGenerator {}
 
   object RainforestUserData extends  StubGenerator {}
 
-  val globalFeatureGenerators = Set(SquawkLanguage, HasImage, GlobalUserData)
+  val globalFeatureGenerators = Set(TweetLanguage, HasImage, GlobalUserData)
 
-  val rainforestFeatureGenerators = Set(SquawkLanguage, HasImage, RainforestUserData)
+  val rainforestFeatureGenerators = Set(TweetLanguage, HasImage, RainforestUserData)
 
   trait RainforestData {
     self =>
@@ -258,7 +233,7 @@ object FeatureGeneration extends App {
 
   object SafeRainforestUserData extends StubGenerator with RainforestData {}
 
-  val safeRainforestFeatureGenerator = Set(SquawkLanguage, HasImage, SafeRainforestUserData)
+  val safeRainforestFeatureGenerator = Set(TweetLanguage, HasImage, SafeRainforestUserData)
 
 
 

@@ -5,9 +5,9 @@ import org.http4s.dsl.io._
 import fs2.{Stream, StreamApp}
 import fs2.StreamApp.ExitCode
 import org.http4s.server.blaze._
-import cats.effect._
+import cats.effect.IO
 
-//import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext.Implicits.global
 
 
 object ModelSupervisor extends StreamApp[IO] {
