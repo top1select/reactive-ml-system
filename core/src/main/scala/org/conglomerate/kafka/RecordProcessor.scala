@@ -1,7 +1,8 @@
 package org.conglomerate.kafka
 
 import org.apache.kafka.clients.consumer.ConsumerRecord
-import scala.collection.concurrent.Map
+import java.util.concurrent.atomic._
+
 
 /**
   * Used by {@link DataCollector}. It's generally NOT recommended to use a global, static,
@@ -9,10 +10,11 @@ import scala.collection.concurrent.Map
   */
 class RecordProcessor extends RecordProcessorTrait[Array[Byte], Array[Byte]] {
   override def processRecord(record: ConsumerRecord[Array[Byte], Array[Byte]]): Unit = {
-    RecordProcessor.count += 1
+//    RecordProcessor.count += 1
+    RecordProcessor.atomicCount.getAndIncrement()
     val key = record.key()
     val value = record.value()
-    println(s"Retrieved message #${RecordProcessor.count}: " +
+    println(s"Retrieved message #${RecordProcessor.atomicCount}: " +
       mkString("key", key) + ", " + mkString("value", value))
   }
 
@@ -23,5 +25,6 @@ class RecordProcessor extends RecordProcessorTrait[Array[Byte], Array[Byte]] {
 }
 
 object RecordProcessor {
-  var count = 0L
+//  var count = 0L
+  val atomicCount = new AtomicLong()
 }
