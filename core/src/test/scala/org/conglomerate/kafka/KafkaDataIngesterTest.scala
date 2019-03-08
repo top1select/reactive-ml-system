@@ -1,12 +1,14 @@
 package org.conglomerate.kafka
 
-import org.conglomerate.kafka.utils.{DataConvertor, RawWeatherData}
+import org.conglomerate.kafka.utils.DataConvertor
 import org.conglomerate.settings.WeatherSettings
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.{FunSuite, Matchers, WordSpec}
 
 import scala.io.Source
 import java.io.File
+
+import org.conglomerate.utils.RawWeatherData
 
 import scala.collection.mutable.ListBuffer
 
@@ -24,17 +26,23 @@ class KafkaDataIngesterTest extends FunSuite with Matchers with TableDrivenPrope
 
     val batch = ListBuffer[Array[Byte]]()
     // raw data from csv file
-    val record = "724940:23234,2008,01,01,01,10.6,3.3,1023.5,100,4.1,4,0.0,0.0"
+    val records = Seq(
+      "724940:23234,2008,01,01,01,10.6,3.3,1023.5,100,4.1,4,0.0,0.0",
+      "724940:23234,2008,01,01,01,10.6,3.3,1023.5,100,4.1,4,0.0,0.0",
+      "724940:23234,2008,01,01,01,10.6,3.3,1023.5,100,4.1,4,0.0,0.0")
+
+    val rawWeatherData = RawWeatherData(records(0).split(","))
+
+    assert(rawWeatherData.wsid == "724940:23234")
 //      test for dirty data
 //      "724940: 23234, 2008, 1, 1, 0, 11.7, -0.6, 1023.8, 50, 7.2, 2,, 0.0, 0.0"
 
-    // case class
-    val report = RawWeatherData(record.split(","))
+    records.foreach(record => {
+      //serialise to Protobuf
+      batch += DataConvertor.convertToPB(record)
+    })
 
-    assert(report.wsid == "724940:23234")
-    //serialise to Protobuf
-    batch += DataConvertor.convertToPB(record)
-    assert(batch.size == 1)
+    assert(batch.size == 3)
 
 
 //    assert(groups.size === 2)

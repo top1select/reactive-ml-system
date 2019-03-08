@@ -6,7 +6,7 @@ import java.io.ByteArrayOutputStream
 import cats.instances.list._
 import cats.instances.option._
 import pbdirect._
-import org.conglomerate.kafka.utils.RawWeatherData
+import org.conglomerate.utils.RawWeatherData
 
 
 import org.json4s.DefaultFormats

@@ -1,19 +1,10 @@
 package com.reactivemachinelearning.collect
 
 import com.typesafe.config.ConfigFactory
-import akka.kafka.{ProducerMessage, ProducerSettings, Subscriptions}
-import akka.kafka.scaladsl.{Consumer, Producer}
-import akka.stream.scaladsl.{Keep, Sink, Source}
-import org.apache.kafka.clients.producer.ProducerRecord
-import org.apache.kafka.common.serialization.StringSerializer
-
-import scala.concurrent.Future
-import akka.Done
-import akka.kafka.ProducerMessage.MultiResultPart
 import org.slf4j.LoggerFactory
+import org.conglomerate.configuration.kafka.ApplicationKafkaParameters._
+import org.conglomerate.kafka.{MessageListener, RecordProcessor}
 
-import scala.concurrent.duration._
-import scala.concurrent.duration.FiniteDuration
 
 object DataCollector {
 
@@ -25,18 +16,18 @@ object DataCollector {
   // #settings
   val config = ConfigFactory.load().getConfig("akka.kafka.producer")
 
-  val producerSettings = ProducerSettings(config, new StringSerializer, new StringSerializer)
-      .withBootstrapServers(bootstrapServers)
+  /**
+    * A very simple Kafka consumer that reads the records that are written to Kafka by {@link DataProvider}.
+    * Use this app as a sanity check if you suspect something is wrong with writing the data...
+    */
+  def main(args: Array[String]) {
 
-  val kafkaProducer = producerSettings.createKafkaProducer()
+    println(s"Using kafka brokers at ${KAFKA_BROKER}, subscribing to topic ${DATA_TOPIC}")
 
-//
-//  val done: Future[Done] = Source(1 to 100)
-//  .map(_.toString)
-//    .map(value => new ProducerRecord[String, String](topic, value))
-//    .runWith(Producer.plainSink(producerSettings, kafkaProducer))
-//
+    val listener = MessageListener(KAFKA_BROKER, DATA_TOPIC, DATA_GROUP, new RecordProcessor())
 
+    listener.start()
+  }
 
 
 }
