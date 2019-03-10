@@ -7,20 +7,24 @@ import org.apache.spark.mllib.regression.LabeledPoint
 import org.apache.spark.mllib.stat.Statistics
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
+import org.apache.kafka.clients.consumer.ConsumerRecord
 
 
-object FeatureGeneration extends App {
+object TweetFeatureGeneration extends App {
 
   // setup
   val session = SparkSession.builder.appName("Feature Generation").getOrCreate()
+
   import session.implicits._
 
   case class Tweet(id: Int, text: String)
 
   // Input data: Each row is a 140 character or less tweet
-  val tweets = Seq(Tweet(123, "Clouds sure make it hard to look on the bright side of things."),
+  val tweets = Seq(
+    Tweet(123, "Clouds sure make it hard to look on the bright side of things."),
     Tweet(124, "Who really cares who gets the worm?  I'm fine with sleeping in."),
-    Tweet(125, "Why don't french fries grow on trees?"))
+    Tweet(125, "Why don't french fries grow on trees?")
+  )
 
   val tweetsDF = session.createDataFrame(tweets).toDF("tweetId", "tweet")
 
@@ -28,11 +32,11 @@ object FeatureGeneration extends App {
 
   val tokenized = tokenizer.transform(tweetsDF)
 
-  tokenized.select("words","tweetId").show()
+  tokenized.select("words", "tweetId").show()
 
   trait FeatureType[V] {
     val name: String
-//    type V
+    //    type V
   }
 
   trait Feature[V] extends FeatureType[V] {
@@ -40,11 +44,11 @@ object FeatureGeneration extends App {
   }
 
   case class WordSequenceFeature(name: String, value: Seq[String])
-  extends Feature[Seq[String]]
+    extends Feature[Seq[String]]
 
   val wordsFeatures = tokenized.select("words")
-    .map( row =>
-    WordSequenceFeature("words", row.getSeq[String](0)))
+    .map(row =>
+      WordSequenceFeature("words", row.getSeq[String](0)))
 
   wordsFeatures.show()
 
@@ -104,7 +108,7 @@ object FeatureGeneration extends App {
 
   case class BooleanLabel(name: String, value: Boolean) extends Label[Boolean]
 
-  def toBooleanLabel(feature: BooleanFeature)  ={
+  def toBooleanLabel(feature: BooleanFeature) = {
     BooleanLabel(feature.name, feature.value)
   }
 
@@ -137,8 +141,9 @@ object FeatureGeneration extends App {
     .transform(instanceDF)
 
   val labeledPoints = session.sparkContext.parallelize(instances.map(
-    {case (id, features, label)=>
-    LabeledPoint(label = label, features = features)}
+    { case (id, features, label) =>
+      LabeledPoint(label = label, features = features)
+    }
   ))
 
   println("chi-squared results")
@@ -208,13 +213,13 @@ object FeatureGeneration extends App {
 
   object HasImage extends StubGenerator {}
 
-  object UserData extends  StubGenerator {}
+  object UserData extends StubGenerator {}
 
   val featureGenerators = Set(TweetLanguage, HasImage, UserData)
 
   object GlobalUserData extends StubGenerator {}
 
-  object RainforestUserData extends  StubGenerator {}
+  object RainforestUserData extends StubGenerator {}
 
   val globalFeatureGenerators = Set(TweetLanguage, HasImage, GlobalUserData)
 
@@ -234,19 +239,5 @@ object FeatureGeneration extends App {
   object SafeRainforestUserData extends StubGenerator with RainforestData {}
 
   val safeRainforestFeatureGenerator = Set(TweetLanguage, HasImage, SafeRainforestUserData)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

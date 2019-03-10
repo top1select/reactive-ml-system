@@ -1,6 +1,6 @@
 package com.reactivemachinelearning.feature
 
-import com.reactivemachinelearning.feature.FeatureGeneration.IntFeature
+import com.reactivemachinelearning.feature.TweetFeatureGeneration.IntFeature
 
 object CategoricalTransforms {
 

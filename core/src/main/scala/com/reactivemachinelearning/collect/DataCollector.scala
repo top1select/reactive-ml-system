@@ -24,10 +24,12 @@ object DataCollector {
 
     println(s"Using kafka brokers at ${KAFKA_BROKER}, subscribing to topic ${DATA_TOPIC}")
 
-    val listener = MessageListener(KAFKA_BROKER, DATA_TOPIC, DATA_GROUP, new RecordProcessor())
+//    val listener = MessageListener(KAFKA_BROKER, DATA_TOPIC, DATA_GROUP, new RecordProcessor())
+
+    val listener = MessageListener(KAFKA_BROKER, DATA_TOPIC, DATA_GROUP, new WeatherRecordProcessor())
 
     listener.start()
-  }
 
+  }
 
 }

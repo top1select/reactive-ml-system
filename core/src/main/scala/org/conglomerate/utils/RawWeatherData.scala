@@ -34,7 +34,7 @@ case class RawWeatherData(
         sixHourPrecip: Double
         ) extends Serializable
 
-        object RawWeatherData {
+object RawWeatherData {
         /** Tech debt - don't do it this way ;) */
         def apply(array: Array[String]): RawWeatherData = {
         RawWeatherData(
@@ -53,5 +53,4 @@ case class RawWeatherData(
         oneHourPrecip = array(11).toDouble,
         sixHourPrecip = Option(array(12).toDouble).getOrElse(0)
         )
-        }
-        }
+}}

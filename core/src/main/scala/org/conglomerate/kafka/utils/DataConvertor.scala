@@ -2,9 +2,6 @@ package org.conglomerate.kafka.utils
 
 import java.io.ByteArrayOutputStream
 
-
-import cats.instances.list._
-import cats.instances.option._
 import pbdirect._
 import org.conglomerate.utils.RawWeatherData
 
@@ -28,6 +25,10 @@ object DataConvertor {
     // serialise to Protobuf
     val bytes = report.toPB
     bytes
+  }
+
+  def convertToObject(bytes: Array[Byte]): RawWeatherData = {
+    bytes.pbTo[RawWeatherData]
   }
 
 

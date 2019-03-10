@@ -10,6 +10,7 @@ lazy val http4sVersion = "0.18.21"
 libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-core" % "2.4.0",
   "org.apache.spark" %% "spark-mllib" % "2.4.0",
+  "org.apache.spark" %% "spark-sql-kafka-0-10" % "2.4.0",
   
   "org.scalaz" %% "scalaz-core" % "7.3.0-M27",
   "org.scalaz" %% "scalaz-concurrent" % "7.3.0-M27",
@@ -35,7 +36,7 @@ libraryDependencies ++= Seq(
   "org.http4s" %% "http4s-blaze-client" % http4sVersion,
   "org.http4s" %% "http4s-argonaut" % http4sVersion,
 
-  
+  "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.9.8",
   "com.github.nscala-time" %% "nscala-time" % "2.22.0",
   "org.typelevel" %% "cats-effect" % "1.2.0",
   "com.typesafe.play" %% "play-json" % "2.7.1",

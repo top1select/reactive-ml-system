@@ -18,6 +18,7 @@ class RecordProcessor extends RecordProcessorTrait[Array[Byte], Array[Byte]] {
       mkString("key", key) + ", " + mkString("value", value))
   }
 
+
   private def mkString(label: String, array: Array[Byte]) = {
     if (array == null) s"${label} = ${array}"
     else s"${label} = ${array}, size = ${array.size}, first 5 elements = ${array.take(5).mkString("[", ",", "]")}"

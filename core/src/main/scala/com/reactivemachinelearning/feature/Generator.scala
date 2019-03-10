@@ -1,8 +1,9 @@
 package com.reactivemachinelearning.feature
 
-import com.reactivemachinelearning.feature.FeatureGeneration.{Feature, Tweet}
+//import org.apache.kafka.clients.consumer.ConsumerRecord
+
+import com.reactivemachinelearning.feature.TweetFeatureGeneration.{Feature, Tweet}
 
 trait Generator[V] {
-  def generate(tweet: Tweet): Feature[V]
-
+  def generate(t: Tweet): Feature[V]
 }
