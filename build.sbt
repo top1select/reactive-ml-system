@@ -23,19 +23,25 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-http-spray-json" % "10.0.10",
   "com.typesafe.akka" %% "akka-http-testkit" % "10.0.10",
   "com.typesafe.akka" %% "akka-slf4j" % akkaV,
+  "de.heikoseeberger" %% "akka-http-jackson" % "1.25.2",
 //  "ch.qos.logback" % "logback-classic" % "1.2.3",
 
   "org.apache.kafka" %% "kafka" % "2.1.1",
   "org.apache.kafka" % "kafka-clients" % "2.1.1",
   "org.apache.kafka" % "kafka-streams" % "2.1.1",
 
+  "org.jpmml" % "pmml-model" % "1.4.8",
+  "org.jpmml" % "pmml-evaluator" % "1.4.7",
+  "org.jpmml" % "pmml-evaluator-extension" % "1.4.7",
+  "org.tensorflow" % "tensorflow" % "1.13.1",
+  
   "org.apache.curator" % "curator-test" % "4.1.0",
   
   "org.http4s" %% "http4s-dsl" % http4sVersion,
   "org.http4s" %% "http4s-blaze-server" % http4sVersion,
   "org.http4s" %% "http4s-blaze-client" % http4sVersion,
   "org.http4s" %% "http4s-argonaut" % http4sVersion,
-
+  
   "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.9.8",
   "com.github.nscala-time" %% "nscala-time" % "2.22.0",
   "org.typelevel" %% "cats-effect" % "1.2.0",
