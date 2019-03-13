@@ -23,7 +23,7 @@ object ModelToServe {
   def fromByteArray(message: Array[Byte]): Try[ModelToServe] = Try {
     val m = message.pbTo[ModelDescriptor]
 
-    if (Some(m.data)) {
+    if (m.data != null) {
       new ModelToServe(m.name, m.description, m.modelType, m.data.get, m.dataType)
     } else {
       throw new Exception("Location based is not yet supported")

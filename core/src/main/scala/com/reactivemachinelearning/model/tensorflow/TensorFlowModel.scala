@@ -1,7 +1,7 @@
 package com.reactivemachinelearning.model.tensorflow
 
 import com.reactivemachinelearning.model.{Model, ModelFactory, ModelToServe}
-import org.conglomerate.utils.{ModelType, RawWeatherData}
+import org.conglomerate.utils.{ModelType, RawData, RawWeatherData}
 import org.tensorflow.{Graph, Session, Tensor}
 
 class TensorFlowModel(inputStream: Array[Byte]) extends Model {
@@ -10,11 +10,11 @@ class TensorFlowModel(inputStream: Array[Byte]) extends Model {
   graph.importGraphDef(inputStream)
   val session = new Session(graph)
 
-  override def score(record: RawWeatherData): Any = {
+  override def score(record: RawData): Any = {
 
     val data = Array(
-      record.wsid.toFloat,
-      record.day.toFloat
+//      record.wsid.toFloat,
+//      record.day.toFloat
     )
     val modelInput = Tensor.create(Array(data))
     val result = session.runner().feed("dense_1_input", modelInput)
@@ -47,7 +47,7 @@ class TensorFlowModel(inputStream: Array[Byte]) extends Model {
 
   override def toBytes: Array[Byte] = graph.toGraphDef
 
-  override def getType: Long = ModelType.TensorFlow
+  override def getType: Long = ModelType.TensorFlow._pos
 
 }
 

@@ -3,12 +3,13 @@ package com.reactivemachinelearning.model.PMML
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 
 import com.reactivemachinelearning.model.{Model, ModelFactory, ModelToServe}
-import org.conglomerate.utils.{ModelDescriptor, ModelType, RawWeatherData}
+import org.conglomerate.utils.{ModelDescriptor, ModelType, RawData, RawWeatherData}
 import org.dmg.pmml.{FieldName, PMML}
 import org.jpmml.evaluator.visitors._
 import org.jpmml.evaluator._
 import org.jpmml.model.PMMLUtil
 import pbdirect._
+
 import scala.collection.JavaConverters._
 import scala.collection._
 
@@ -28,7 +29,7 @@ val evaluator = ModelEvaluatorFactory.newInstance.newModelEvaluator(pmml)
   val target: TargetField = evaluator.getTargetFields.get(0)
   val tname = target.getName
 
-  override def score(record: RawWeatherData): Any = {
+  override def score(record: RawData): Any = {
     arguments.clear()
     inputFields.asScala.foreach(field => {
       arguments.put(field.getName, field.prepare(getValueByName(record, field.getName.getValue)))
@@ -44,15 +45,22 @@ val evaluator = ModelEvaluatorFactory.newInstance.newModelEvaluator(pmml)
 
   override def cleanup(): Unit = {}
 
-  private def getValueByName(data: RawWeatherData, name: String): Double =
-    PMMLModel.names.get(name) match {
-      case Some(index) => {
-        val v = data(index + 1)
-        v
-//        v.asInstanceOf[Double]
-      }
-      case _ => .0
+  private def getValueByName(input: RawData, name: String): Double = {
+
+    val modelNames = input.getClass.getSimpleName match {
+      case "RawWeatherData" => RawWeatherData.names
+      case "other" => RawWeatherData.names
     }
+
+    modelNames.get(name) match {
+      case Some(index) => {
+        val v = input.productElement(index + 1)
+        v.asInstanceOf[Double]
+      }
+      case _ =>.0
+    }
+  }
+
 
   override def toBytes: Array[Byte] = {
     val stream = new ByteArrayOutputStream()
@@ -82,11 +90,6 @@ object PMMLModel extends ModelFactory {
     }
     )
   }
-
-  private val names = Map(
-    "good weather" -> 0,
-    "bad weather" -> 1
-  )
 
 
   // Exercise:

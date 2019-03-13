@@ -29,8 +29,10 @@ libraryDependencies ++= Seq(
   "org.apache.kafka" %% "kafka" % "2.1.1",
   "org.apache.kafka" % "kafka-clients" % "2.1.1",
   "org.apache.kafka" % "kafka-streams" % "2.1.1",
+  "org.apache.kafka" %% "kafka-streams-scala" % "2.1.1",
 
-  "org.jpmml" % "pmml-model" % "1.4.8",
+
+"org.jpmml" % "pmml-model" % "1.4.8",
   "org.jpmml" % "pmml-evaluator" % "1.4.7",
   "org.jpmml" % "pmml-evaluator-extension" % "1.4.7",
   "org.tensorflow" % "tensorflow" % "1.13.1",

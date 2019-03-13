@@ -3,30 +3,32 @@ package com.reactivemachinelearning.model
 import java.io.{DataInputStream, DataOutputStream}
 
 import com.reactivemachinelearning.model.PMML.PMMLModel
+import com.reactivemachinelearning.model.tensorflow.TensorFlowModel
 import org.conglomerate.utils.ModelType
+import org.conglomerate.utils.ModelType.TensorFlow
 
 import scala.util.Try
 
 /**
   * Implementation of a message sent to an Actor with data for a new model instance.
   */
-case class ModelWithDescriptor(model: Model, descriptor: ModelToServe) {
-
-}
+case class ModelWithDescriptor(model: Model, descriptor: ModelToServe) {}
 
 object ModelWithDescriptor {
 
   private val factories = Map(
-    ModelType.PMML -> PMMLModel
+    ModelType.PMML.toString -> PMMLModel,
+    ModelType.TensorFlow.toString -> TensorFlowModel
   )
 
   private val factoriesInt = Map(
-    ModelType.PMML._pos -> PMMLModel
+    ModelType.PMML._pos -> PMMLModel,
+    ModelType.TensorFlow._pos -> TensorFlowModel
   )
 
   def fromModelToServe(descriptor: ModelToServe): Try[ModelWithDescriptor] = Try {
     println(s"New model - $descriptor")
-    factories.get(descriptor.modelType.) match {
+    factories.get(descriptor.modelType.toString) match {
       case Some(factory) => ModelWithDescriptor(factory.create(descriptor), descriptor)
       case _ => throw new Throwable("Undefined model type")
     }
@@ -50,9 +52,9 @@ object ModelWithDescriptor {
           case _ => None
         }
       case _ => None
-    }
+    }}
 
-    def writeModel(output: DataOutputStream, model: Model): Unit = {
+  def writeModel(output: DataOutputStream, model: Model) = {
       if (model == null)
         output.writeLong(0L)
       else {
@@ -67,5 +69,5 @@ object ModelWithDescriptor {
         }
       }
     }
-  }
+
 }

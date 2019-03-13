@@ -1,4 +1,7 @@
-package org.conglomerate.utils;
+package org.conglomerate.utils
+
+import scala.collection.Map
+;
 
 
 /**
@@ -32,9 +35,10 @@ case class RawWeatherData(
         skyConditionText: String,
         oneHourPrecip: Double,
         sixHourPrecip: Double
-        ) extends Serializable
+        ) extends RawData
 
 object RawWeatherData {
+
         /** Tech debt - don't do it this way ;) */
         def apply(array: Array[String]): RawWeatherData = {
         RawWeatherData(
@@ -52,5 +56,11 @@ object RawWeatherData {
         skyConditionText = "",
         oneHourPrecip = array(11).toDouble,
         sixHourPrecip = Option(array(12).toDouble).getOrElse(0)
+        )}
+
+        val names = Map(
+                "good weather" -> 0,
+                "bad weather" -> 1
         )
-}}
+
+}

@@ -17,6 +17,9 @@ public class ApplicationKafkaParameters {
     public static final String DATA_TOPIC = "killrweather.raw";
     public static final String MODELS_TOPIC = "models";
 
+    public static final String DATA_TOPIC_SUCCESS = "killrweather.success";
+    public static final String DATA_TOPIC_FAILURE = "killrweather.failure";
+
     public static final String DATA_GROUP = "weatherRecordsGroup";
     public static final String MODELS_GROUP = "modelRecordsGroup";
 

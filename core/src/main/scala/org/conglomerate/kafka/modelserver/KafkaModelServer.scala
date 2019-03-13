@@ -1,10 +1,12 @@
 package org.conglomerate.kafka.modelserver
 
 import java.util.Properties
-import org.conglomerate.configuration.kafka.ApplicationKafkaParameters
 
+import org.conglomerate.configuration.kafka.ApplicationKafkaParameters
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.{KafkaStreams, StreamsConfig}
+import org.conglomerate.kafka.modelserver.standardstore.StandardStoreStreamBuilder
+import org.conglomerate.kafka.queriablestate.RestServiceStore
 
 import scala.util.control.NonFatal
 
@@ -12,6 +14,8 @@ import scala.util.control.NonFatal
   * Entry point for the Kafka Streams of model management and serving.
   */
 object KafkaModelServer {
+
+  import ApplicationKafkaParameters._
 
   private val port = 8888 // Port for queryable state
 
@@ -33,8 +37,6 @@ object KafkaModelServer {
 
   def main(args: Array[String]): Unit = {
 
-    import ApplicationKafkaParameters._
-
     System.out.println("Using kafka brokers at " + KAFKA_BROKER)
     val streamsConfiguration = new Properties
     // Give the Streams application a unique name.  The name must be unique in the Kafka cluster
@@ -53,20 +55,20 @@ object KafkaModelServer {
     // You can either pick which one to run using a command-line argument, or for ease of use
     // with the IDE Run menu command, just switch which line is commented out for "case Nil => ...".
     val streams: KafkaStreams = args.toSeq match {
-      case ("m" | "memory") +: tail =>
-        println("Using in memory store")
-        setupMemoryStoreStreams(streamsConfiguration)
-      case ("c" | "custom") +: tail =>
-        println("Using Custom store")
-        setupCustomStoreStreams(streamsConfiguration)
+//      case ("m" | "memory") +: tail =>
+//        println("Using in memory store")
+//        setupMemoryStoreStreams(streamsConfiguration)
+//      case ("c" | "custom") +: tail =>
+//        println("Using Custom store")
+//        setupCustomStoreStreams(streamsConfiguration)
       case ("s" | "standard") +: tail =>
         println("Using Standard store")
         setupStandardStoreStreams(streamsConfiguration)
       case ("-h" | "--help") +: tail => help()
       case Nil =>
         //        setupMemoryStoreStreams(streamsConfiguration)
-        setupCustomStoreStreams(streamsConfiguration)
-      //        setupStandardStoreStreams(streamsConfiguration)
+//        setupCustomStoreStreams(streamsConfiguration)
+              setupStandardStoreStreams(streamsConfiguration)
       case _ => help(s"Unexpected arguments: ${args.mkString(" ")}", 1)
     }
 
@@ -77,27 +79,45 @@ object KafkaModelServer {
     })
     streams.start()
     // add shutdown hook to respond to SIGTERM and gracefully close Kafka streams
-    sys.addShutdownHook{
+    sys.addShutdownHook {
       try {
         streams.close()
       } catch {
         case NonFatal(e) => // Swallow
       }
     }
-    /*
-     * Setup streams with the built-in ("standard") store.
-     * Create the topology and the rest service.
-     */
-    private def setupStandardStoreStreams(properties: Properties): KafkaStreams = {
-      val streams =
-        RestSer
-    }
-
-
-
   }
 
-
-
-
+  /*
+   * Setup streams with the built-in ("standard") store.
+   * Create the topology and the rest service.
+   */
+  private def setupStandardStoreStreams(streamsConfiguration: Properties): KafkaStreams = {
+    val streams = StandardStoreStreamBuilder.createStreamFluent(streamsConfiguration)
+    // Start the Restful proxy for servicing remote access to state stores
+    RestServiceStore.startRestProxy(streams, port, "standard")
+    streams
   }
+
+  /*
+   * Setup streams with a custom store.
+   * Create the topology and the rest service.
+   */
+//  private def setupCustomStoreStreams(streamsConfiguration: Properties): KafkaStreams = {
+//    val streams = CustomStoreStreamBuilder.createStreamsFluent(streamsConfiguration)
+//    // Start the Restful proxy for servicing remote access to state stores
+//    RestServiceStore.startRestProxy(streams, port, "custom")
+//    streams
+//  }
+
+  /*
+   * Setup streams with an in-memory ("naive") store.
+   * Create the topology and the rest service.
+   */
+//  private def setupMemoryStoreStreams(streamsConfiguration: Properties): KafkaStreams = {
+//    val streams = MemoryStoreStreamBuilder.createStreams(streamsConfiguration)
+//    // Start the Restful proxy for servicing remote access to state stores
+//    RestServiceInMemory.startRestProxy(streams, port)
+//    streams
+//  }
+}

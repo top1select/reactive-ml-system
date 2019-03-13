@@ -3,6 +3,7 @@ package org.conglomerate.kafka.streams
 
 import org.apache.kafka.streams.kstream._
 import org.apache.kafka.streams.KeyValue
+import org.apache.kafka.streams.kstream.Consumed
 import org.apache.kafka.common.serialization.Serde
 
 import scala.language.implicitConversions
@@ -11,7 +12,6 @@ import scala.language.implicitConversions
   * Implicit conversions between the Scala wrapper objects and the underlying Java
   * objects.
   */
-
 object ImplicitConversions {
 
   implicit def wrapKStream[K, V](inner: KStream[K, V]): KStreamS[K, V] =
@@ -38,8 +38,8 @@ object ImplicitConversions {
   // we would also like to allow users implicit serdes
   // and these implicits will convert them to `Serialized`, `Produced` or `Consumed`
 
-  implicit def serializedFromSerde[K, V](implicit keySerde: Serde[K], valueSerde: Serde[V]): Serialized[K, V] =
-    Serialized.`with`(keySerde, valueSerde)
+  implicit def serializedFromSerde[K, V](implicit keySerde: Serde[K], valueSerde: Serde[V]): Grouped[K, V] =
+    Grouped.`with`(keySerde, valueSerde)
 
   implicit def consumedFromSerde[K, V](implicit keySerde: Serde[K], valueSerde: Serde[V]): Consumed[K, V] =
     Consumed.`with`(keySerde, valueSerde)
@@ -50,5 +50,4 @@ object ImplicitConversions {
   implicit def joinedFromKVOSerde[K, V, VO](implicit keySerde: Serde[K], valueSerde: Serde[V],
                                             otherValueSerde: Serde[VO]): Joined[K, V, VO] =
     Joined.`with`(keySerde, valueSerde, otherValueSerde)
-
 }
