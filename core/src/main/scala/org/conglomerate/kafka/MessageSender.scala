@@ -1,7 +1,9 @@
 package org.conglomerate.kafka
 
-import org.apache.kafka.clients.producer.{ KafkaProducer, ProducerConfig, ProducerRecord, RecordMetadata }
+import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord, RecordMetadata}
 import java.util.Properties
+
+import org.apache.kafka.common.serialization.ByteArraySerializer
 
 object MessageSender {
   private val ACKCONFIGURATION = "all" // Blocking on the full commit of the record
@@ -30,10 +32,19 @@ object MessageSender {
   def apply[K, V](brokers: String, keySerializer: String, valueSerializer: String): MessageSender[K, V] =  {
     new MessageSender[K, V](brokers,keySerializer, valueSerializer)
   }
+
+  def apply[K, V](brokers: String): MessageSender[K, V] = {
+    new MessageSender[K, V](brokers)
+  }
+
 }
 
 class MessageSender[K, V](val brokers: String, val keySerializer: String, val valueSerializer: String)
 {
+  def this(brokers: String) {
+    this(brokers, classOf[ByteArraySerializer].getName, classOf[ByteArraySerializer].getName)
+  }
+
   import MessageSender._
   val producer = new KafkaProducer[K, V](providerProperties(brokers,keySerializer,valueSerializer))
 
