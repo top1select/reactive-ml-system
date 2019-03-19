@@ -1,8 +1,6 @@
 package org.conglomerate.utils
 
 import scala.collection.Map
-;
-
 
 /**
  * @param wsid Composite of Air Force Datsav3 station number and NCDC WBAN number

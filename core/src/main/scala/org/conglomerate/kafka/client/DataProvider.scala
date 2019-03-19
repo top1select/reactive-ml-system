@@ -3,19 +3,17 @@ package org.conglomerate.kafka.client
 import java.io.{ByteArrayOutputStream, File}
 import java.nio.file.{Files, Paths}
 
-import com.google.protobuf.ByteString
+import javax.script.ScriptException
 import org.apache.kafka.common.serialization.ByteArraySerializer
 import org.conglomerate.kafka.{KafkaLocalServer, MessageSender}
 import org.conglomerate.configuration.kafka.ApplicationKafkaParameters._
 import org.conglomerate.kafka.utils.{DataConvertor, FilesIterator}
-import org.conglomerate.utils.{ModelDescriptor, RawData, RawWeatherData}
 
 import scala.concurrent.Future
-import scala.io.Source
 import pbdirect._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import org.conglomerate.utils.{ModelDescriptor, ModelType, RawData, RawWeatherData}
+import org.conglomerate.utils.{ModelDescriptor, ModelType, RawWeatherData}
 import org.slf4j.LoggerFactory
 
 /**
@@ -26,7 +24,7 @@ object DataProvider {
 
   val file = "data/load/sf-2008.csv.gz"
   var dataTimeInterval = 1000 * 1 // 1 sec
-  val directory = "data/weather"
+  val directory = "data/weather/"
   val tensorfile = "data/optimized_WineQuality.pb"
   var modelTimeInterval = 1000 * 60 * 1 // 5 mins
 
@@ -56,7 +54,7 @@ object DataProvider {
     logger.info(s"Cluster started")
 
 //    publishData()
-    publishModels()
+    publishModels(directory)
 
     while (true)
       pause(60)
@@ -87,42 +85,41 @@ object DataProvider {
     //    System.out.println(s"Total models in the model files is: ${files.size}")
     logger.info(s"Total models in the model files is: ${files.size}")
 
-
     val sender = MessageSender[Array[Byte], Array[Byte]](KAFKA_BROKER,
       classOf[ByteArraySerializer].getName, classOf[ByteArraySerializer].getName)
 
-
-
-//    val bos = new ByteArrayOutputStream()
+    //    val bos = new ByteArrayOutputStream()
     while(true && files.size != 0) {
-      files.foreach( f => {
-        // PMML
-        val pByteArray = Files.readAllBytes(Paths.get(directory + f))
+      files.foreach{ case(fileName, fileExtension) => {
+        // PMML or TensorFlow
+//        System.out.println("Paths.get(directory + fileName) is: " + Paths.get(directory + fileName))
+        val pByteArray = Files.readAllBytes(Paths.get(directory + fileName))
         val pRecord = ModelDescriptor(
-          name = f.dropRight(5),
+          name = fileName.dropRight(fileExtension.size+1),
           description = "generated from SparkML",
-          modelType = ModelType.PMML,
+          modelType = ModelType.PMML, //{if (fileExtension == "pmml") ModelType.PMML else ModelType.TensorFlow},
           dataType = "weather",
-          data = Some(pByteArray),
+          data = null,//Some(pByteArray),
           location = null
         )
-        sender.writeValue(MODELS_TOPIC, pRecord.toPB)
+
+        try {
+          System.out.println("AAAA")
+          System.out.println(pRecord)
+          System.out.println(pRecord.getClass)
+          val bytes = pRecord.toPB
+          System.out.println(bytes)
+          System.out.println("BBBB")
+        }
+        catch {
+          case e: ScriptException => e.printStackTrace
+        }
+
+//        sender.writeValue(MODELS_TOPIC, pRecord.toPB)
+//        sender.writeValue(MODELS_TOPIC,null)
         println(s"Published Model ${pRecord.description}")
         pause(modelTimeInterval)
-      })
-      //TensorFlow
-      val tByteArray = Files.readAllBytes(Paths.get(tensorfile))
-      val tRecord = ModelDescriptor(
-        name = tensorfile.dropRight(3),
-        description = "generated from TensorFlow",
-        modelType = ModelType.TensorFlow,
-        dataType = "weather",
-        data = Some(tByteArray),
-        location = null
-      )
-      sender.writeValue(MODELS_TOPIC, tRecord.toPB)
-      println(s"Published Model ${tRecord.description}")
-      pause(modelTimeInterval)
+      }}
     }
   }
 
@@ -135,23 +132,23 @@ object DataProvider {
   }
 
 
-  def getListOfModelFiles1(dir: String): Seq[String] = {
+  def getListOfModelFiles(dir: String): Seq[(String,String)] = {
     val d = new File(dir)
     if(d.exists() && d.isDirectory) {
       d.listFiles.filter(f => f.isFile)
         .map(f => {
         val fileName = f.getName
         val i = fileName.lastIndexOf(".")
-        if(i > 0)
+//        if(i > 0)
           // file extension
           (fileName, fileName.substring(i+1))
       })
     } else
-      Seq.empty[String]
+      Seq.empty[(String,String)]
   }
 
 
-  def getListOfModelFiles(dir: String): Seq[String] = {
+  def getListOfModelFilesX(dir: String): Seq[String] = {
     val d = new File(dir)
     if(d.exists() && d.isDirectory) {
       d.listFiles
@@ -160,4 +157,5 @@ object DataProvider {
     } else
       Seq.empty[String]
   }
+
 }

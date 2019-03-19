@@ -12,7 +12,7 @@ case class ModelDescriptor (
                       // Byte array containing the model
                       data: Option[Array[Byte]],
                       location: Option[String]
-  ) extends Serializable
+  ) //extends Serializable
 
 sealed trait ModelType extends Pos
 
