@@ -3,7 +3,7 @@ package org.conglomerate.utils
 import pbdirect._
 
 // Description of the trained model
-case class ModelDescriptor (
+case class ModelDescriptorX (
                       name: String,
                       description: String,
                       // Data type for which this model is applied
