@@ -13,8 +13,12 @@ import scala.concurrent.Future
 import pbdirect._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import org.conglomerate.utils.{ModelDescriptor, ModelType, RawWeatherData}
+import org.conglomerate.utils.{ModelDescriptor, RawWeatherData}
 import org.slf4j.LoggerFactory
+
+import spray.json._
+import org.conglomerate.utils.MyJsonProtocol._
+import DefaultJsonProtocol._
 
 /**
   * Application that publishes models and data records from the `data` directory to the appropriate Kafka topics.
@@ -97,28 +101,31 @@ object DataProvider {
         val pRecord = ModelDescriptor(
           name = fileName.dropRight(fileExtension.size+1),
           description = "generated from SparkML",
-          modelType = ModelType.PMML, //{if (fileExtension == "pmml") ModelType.PMML else ModelType.TensorFlow},
+          modelType = fileExtension, //{if (fileExtension == "pmml") ModelType.PMML else ModelType.TensorFlow},
           dataType = "weather",
-          data = null,//Some(pByteArray),
-          location = null
+          data = Some(pByteArray),
+          location = None
         )
 
+        // check if ModelDescriptor is valid or not
 
 
-        try {
-          System.out.println("AAAA")
-          System.out.println(pRecord)
-          System.out.println(pRecord.getClass)
-          val bytes = pRecord.toPB
-          System.out.println(bytes)
-          System.out.println("BBBB")
-        }
-        catch {
-          case e: ScriptException => e.printStackTrace
-        }
 
-//        sender.writeValue(MODELS_TOPIC, pRecord.toPB)
-//        sender.writeValue(MODELS_TOPIC,null)
+
+//        try {
+//          System.out.println("AAAA")
+//          System.out.println(pRecord)
+//          System.out.println(pRecord.getClass)
+//          val bytes = pRecord.toPB
+////val bytes = pRecord.toJson
+//          System.out.println(bytes)
+//          System.out.println("BBBB")
+//        }
+//        catch {
+//          case e: ScriptException => e.printStackTrace
+//        }
+
+        sender.writeValue(MODELS_TOPIC, pRecord.toPB)
         println(s"Published Model ${pRecord.description}")
         pause(modelTimeInterval)
       }}

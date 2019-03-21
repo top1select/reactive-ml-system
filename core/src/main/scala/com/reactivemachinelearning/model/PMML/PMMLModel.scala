@@ -68,7 +68,7 @@ val evaluator = ModelEvaluatorFactory.newInstance.newModelEvaluator(pmml)
     stream.toByteArray
   }
 
-  override def getType: Long = ModelType.PMML._pos
+  override def getType: Long = ModelType.PMML.id
 
 }
 

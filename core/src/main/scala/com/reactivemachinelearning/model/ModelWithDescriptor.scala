@@ -22,8 +22,8 @@ object ModelWithDescriptor {
   )
 
   private val factoriesInt = Map(
-    ModelType.PMML._pos -> PMMLModel,
-    ModelType.TensorFlow._pos -> TensorFlowModel
+    ModelType.PMML.id -> PMMLModel,
+    ModelType.TensorFlow.id -> TensorFlowModel
   )
 
   def fromModelToServe(descriptor: ModelToServe): Try[ModelWithDescriptor] = Try {

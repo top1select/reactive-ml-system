@@ -47,7 +47,7 @@ class TensorFlowModel(inputStream: Array[Byte]) extends Model {
 
   override def toBytes: Array[Byte] = graph.toGraphDef
 
-  override def getType: Long = ModelType.TensorFlow._pos
+  override def getType: Long = ModelType.TensorFlow.id
 
 }
 

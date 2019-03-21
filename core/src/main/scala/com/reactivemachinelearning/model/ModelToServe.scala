@@ -1,5 +1,6 @@
 package com.reactivemachinelearning.model
 
+import org.conglomerate.utils.ModelType.ModelType
 import org.conglomerate.utils.{ModelDescriptor, ModelType}
 import pbdirect._
 
@@ -9,7 +10,7 @@ import scala.util.Try
   * A wrapper for metadata about a model.
   */
 case class ModelToServe(name: String, description: String,
-                        modelType: ModelType, model: Array[Byte], dataType: String)
+                        modelType: String, model: Array[Byte], dataType: String)
 
 case class ServingResult(processed: Boolean, result: Double = .0, duration: Long = 0L)
 
