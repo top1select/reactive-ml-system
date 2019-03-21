@@ -31,8 +31,11 @@ libraryDependencies ++= Seq(
   "org.apache.kafka" % "kafka-streams" % "2.1.1",
   "org.apache.kafka" %% "kafka-streams-scala" % "2.1.1",
 
+  "com.google.protobuf" % "protobuf-java" % "3.7.0",
+  "io.spray" %%  "spray-json" % "1.3.5",
 
-"org.jpmml" % "pmml-model" % "1.4.8",
+
+  "org.jpmml" % "pmml-model" % "1.4.8",
   "org.jpmml" % "pmml-evaluator" % "1.4.7",
   "org.jpmml" % "pmml-evaluator-extension" % "1.4.7",
   "org.tensorflow" % "tensorflow" % "1.13.1",
@@ -59,3 +62,4 @@ scalacOptions ++= Seq("-Ypartial-unification")
 
 
 mainClass in Compile := Some("com.reactivemachinelearning.respond.ModelSupervisor")
+

@@ -1,5 +1,2 @@
-    <content url="file://$MODULE_DIR$/../../project">
-      <sourceFolder url="file://$MODULE_DIR$/../../project" isTestSource="false" />
-      <excludeFolder url="file://$MODULE_DIR$/../../project/project/target" />
-      <excludeFolder url="file://$MODULE_DIR$/../../project/target" />
-    </content>
+
+protoc --java_out=/Users/willw/Downloads/RustProjects/reactive-ml-system/core/src/main/protobuf /Users/willw/Downloads/RustProjects/reactive-ml-system/core/src/main/protobuf/modeldescriptor.proto
