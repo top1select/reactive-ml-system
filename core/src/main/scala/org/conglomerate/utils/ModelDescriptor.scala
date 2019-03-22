@@ -29,7 +29,7 @@ object ModelType extends Enumeration{
   type ModelType= Value
   val TensorFlow, PMML = Value
 }
-
-object MyJsonProtocol extends DefaultJsonProtocol {
-  implicit val modelFormat = jsonFormat6(ModelDescriptor)
-}
+//
+//object MyJsonProtocol extends DefaultJsonProtocol {
+//  implicit val modelFormat = jsonFormat6(ModelDescriptor)
+//}
