@@ -25,6 +25,7 @@ hs_err_pid*
 data/
 tmp/
 target/
+checkpoints/
 .classpath
 .project
 .settings/
