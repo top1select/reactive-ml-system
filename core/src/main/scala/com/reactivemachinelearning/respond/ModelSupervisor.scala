@@ -9,7 +9,9 @@ import cats.effect.IO
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-
+/**
+  * Use IO and task not future, which runs immediately
+  */
 object ModelSupervisor extends StreamApp[IO] {
 
   def splitTraffic(data: String) = {
