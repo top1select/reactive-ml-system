@@ -7,7 +7,7 @@ import org.apache.spark.mllib.regression.LabeledPoint
 import org.apache.spark.mllib.stat.Statistics
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
-import org.apache.kafka.clients.consumer.ConsumerRecord
+import org.conglomerate.utils.RawData
 
 
 object TweetFeatureGeneration extends App {
@@ -17,7 +17,7 @@ object TweetFeatureGeneration extends App {
 
   import session.implicits._
 
-  case class Tweet(id: Int, text: String)
+  case class Tweet(id: Int, text: String) extends RawData
 
   // Input data: Each row is a 140 character or less tweet
   val tweets = Seq(
@@ -188,14 +188,14 @@ object TweetFeatureGeneration extends App {
   }
 
 
-  object TweetLengthCategoryRefactored extends Generator[Int] {
+  class TweetLengthCategoryRefactored(data: RawData) extends Generator[Int] {
 
     import com.reactivemachinelearning.feature.CategoricalTransforms.categorize
 
     val Thresholds = List(47, 92, 141)
 
-    private def extract(tweet: Tweet): IntFeature = {
-      IntFeature("tweetLength", tweet.text.length)
+    private def extract(data: RawData): IntFeature = {
+      IntFeature("tweetLength", data.text.length)
     }
 
     private def transform(lengthFeature: IntFeature): IntFeature = {
@@ -203,8 +203,8 @@ object TweetFeatureGeneration extends App {
       IntFeature("tweetLengthCategory", tweetLengthCategory.value)
     }
 
-    def generate(tweet: Tweet): IntFeature = {
-      transform(extract(tweet))
+    def generate(data: RawData): IntFeature = {
+      transform(extract(data))
     }
 
   }
