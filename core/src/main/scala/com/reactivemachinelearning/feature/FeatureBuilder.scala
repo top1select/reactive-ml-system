@@ -1,5 +1,6 @@
 package com.reactivemachinelearning.feature
 
+import simulacrum.typeclass
 import breeze.linalg.{DenseVector, SparseVector}
 import breeze.math.Semiring
 import breeze.storage.Zero

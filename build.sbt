@@ -4,6 +4,24 @@ version := "0.1"
 
 scalaVersion := "2.12.7"
 
+val algebirdVersion = "0.13.5"
+val breezeVersion = "1.0-RC2"
+val circeVersion = "0.11.1"
+val commonsMathVersion = "3.6.1"
+val flinkVersion = "1.7.2"
+val hadoopVersion = "3.2.0"
+val paradiseVersion = "2.1.1"
+val scalacheckVersion = "1.14.0"
+val scalatestVersion = "3.0.7"
+val scaldingVersion = "0.17.4"
+val scioVersion = "0.7.4"
+val simulacrumVersion = "0.15.0"
+val sparkVersion = "2.4.0"
+val tensorflowVersion = "1.13.1"
+val xgBoostVersion = "0.80"
+val shapelessDatatypeVersion = "0.1.10"
+val CompileTime = config("compile-time").hide
+
 lazy val akkaV = "2.5.6"
 lazy val http4sVersion = "0.18.21"
 
@@ -54,7 +72,12 @@ libraryDependencies ++= Seq(
 
   "beyondthelines" %% "pbdirect" % "0.1.0",
 
-  "com.iheart" %% "ficus" % "1.4.4")
+  "com.iheart" %% "ficus" % "1.4.4",
+
+  "com.twitter" %% "algebird-core" % algebirdVersion,
+  "com.github.mpilquist" %% "simulacrum" % simulacrumVersion,
+
+)
 
 resolvers += Resolver.bintrayRepo("beyondthelines", "maven")
 

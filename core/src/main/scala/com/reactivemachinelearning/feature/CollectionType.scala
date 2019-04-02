@@ -1,5 +1,6 @@
 package com.reactivemachinelearning.feature
 
+import simulacrum.typeclass
 import scala.collection.generic.CanBuildFrom
 import scala.collection.mutable
 import scala.reflect.ClassTag
