@@ -1,6 +1,6 @@
 package com.reactivemachinelearning.feature.transformers
 
-import com.spotify.featran.{FeatureBuilder, FlatReader, FlatWriter}
+import com.reactivemachinelearning.feature.{FeatureBuilder, FlatReader, FlatWriter}
 import com.twitter.algebird.{Aggregator, Semigroup}
 
 trait SettingsBuilder {

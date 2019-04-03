@@ -76,6 +76,7 @@ libraryDependencies ++= Seq(
 
   "com.twitter" %% "algebird-core" % algebirdVersion,
   "com.github.mpilquist" %% "simulacrum" % simulacrumVersion,
+  "org.scalacheck" %% "scalacheck" % scalacheckVersion
 
 )
 

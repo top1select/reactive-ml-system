@@ -1,7 +1,7 @@
 package com.reactivemachinelearning.feature
 
 import com.reactivemachinelearning.feature.converters.{CaseClassConverter, DefaultTransform}
-import com.reactivemachinelearning.feature.transformers.Transformer
+import com.reactivemachinelearning.feature.transformers.{Settings, Transformer}
 
 import scala.collection.{breakOut, mutable}
 import scala.reflect.ClassTag
@@ -73,6 +73,71 @@ class FeatureSpec[T](val features: Array[Feature[T, _, _, _]]){
     val fs = input.pure(featureSet)
     new FeatureExtractor[M, T](fs, input, None)
   }
+
+  /**
+    * Creates a new FeatureSpec with only the features that respect the given predicate.
+    *
+    * @param predicate Function determining whether or not to include the feature
+    */
+  def filter(predicate: Feature[T, _, _, _] => Boolean): FeatureSpec[T] = {
+    val filteredFeatures = features.filter(predicate)
+    val featuresByName =
+      filteredFeatures.map[(String, Feature[T, _, _, _]), Map[String, Feature[T, _, _, _]]](f =>
+        f.transformer.name -> f)(breakOut)
+
+    new FeatureSpec[T](filteredFeatures)
+  }
+
+  /**
+    * Extract features from an input collection using a partial settings from a previous session.
+    *
+    * This bypasses the `reduce` step in [[extract]] and uses feature summary from settings exported
+    * in a previous session.
+    * @param input input collection
+    * @param settings JSON settings from a previous session
+    * @tparam M input collection type, e.g. `Array`, `List`
+    */
+  def extractWithSubsetSettings[M[_]: CollectionType](input: M[T], settings: M[String]): FeatureExtractor[M, T] = ???
+
+  /**
+    * Extract features from an input collection using settings from a previous session.
+    *
+    * This bypasses the `reduce` step in [[extract]] and uses feature summary from settings exported
+    * in a previous session.
+    * @param input input collection
+    * @param settings JSON settings from a previous session
+    * @tparam M input collection type, e.g. `Array`, `List`
+    */
+  def extractWithSettings[M[_]: CollectionType](input: M[T],
+                                                settings: M[String]): FeatureExtractor[M, T] = {
+    import CollectionType.ops._
+
+    val fs = input.pure(featureSet)
+    new FeatureExtractor[M, T](fs, input, Some(settings))
+  }
+
+  /**
+    * Extract features from individual records using partial settings. Since the
+    * settings are parsed only once, this is more efficient and is recommended when the input is
+    * from an unbounded source, e.g. a stream of events or a backend service.
+    *
+    * This bypasses the `reduce` step in [[extract]] and uses feature summary from settings exported
+    * in a previous session.
+    * @param settings JSON settings from a previous session
+    */
+  def extractWithSubsetSettings[F: FeatureBuilder: ClassTag](settings: String): RecordExtractor[T, F] = ???
+
+  /**
+    * Extract features from individual records using settings from a previous session. Since the
+    * settings are parsed only once, this is more efficient and is recommended when the input is
+    * from an unbounded source, e.g. a stream of events or a backend service.
+    *
+    * This bypasses the `reduce` step in [[extract]] and uses feature summary from settings exported
+    * in a previous session.
+    * @param settings JSON settings from a previous session
+    */
+  def extractWithSettings[F: FeatureBuilder: ClassTag](settings: String): RecordExtractor[T, F] =
+    new RecordExtractor[T, F](new FeatureSet[T](features), settings)
 
 }
 
@@ -180,68 +245,68 @@ private class FeatureSet[T](private[featran] val features: Array[Feature[T, _, _
   }
 
   // Array[Option[C]] => Int
-  def featureDimension(c: ARRAY): Int = {
-    require(n == c.length)
-    var sum = 0
-    var i = 0
-    val m = mutable.Map.empty[String, Int]
-    while (i < n) {
-      val f = features(i)
-      val size = f.unsafeFeatureDimension(c(i))
-      sum += size
-      val name = f.transformer.name
-      if (crossings.keys.contains(name)) {
-        m(name) = size
-      }
-      i += 1
-    }
-    crossings.map.keys.foreach {
-      case (n1, n2) =>
-        sum += m(n1) * m(n2)
-    }
-    sum
-  }
+//  def featureDimension(c: ARRAY): Int = {
+//    require(n == c.length)
+//    var sum = 0
+//    var i = 0
+//    val m = mutable.Map.empty[String, Int]
+//    while (i < n) {
+//      val f = features(i)
+//      val size = f.unsafeFeatureDimension(c(i))
+//      sum += size
+//      val name = f.transformer.name
+//      if (crossings.keys.contains(name)) {
+//        m(name) = size
+//      }
+//      i += 1
+//    }
+//    crossings.map.keys.foreach {
+//      case (n1, n2) =>
+//        sum += m(n1) * m(n2)
+//    }
+//    sum
+//  }
 
   // Array[Option[C]] => Array[String]
-  def featureNames(c: ARRAY): Seq[String] = {
-    require(n == c.length)
-    val b = Seq.newBuilder[String]
-    var i = 0
-    val m = mutable.Map.empty[String, Seq[String]]
-    while (i < n) {
-      val f = features(i)
-      val names = f.unsafeFeatureNames(c(i))
-      b ++= names
-      val name = f.transformer.name
-      if (crossings.keys.contains(name)) {
-        m(name) = names
-      }
-      i += 1
-    }
-    crossings.map.keys.foreach {
-      case (n1, n2) =>
-        for {
-          x <- m(n1)
-          y <- m(n2)
-        } {
-          b += Crossings.name(x, y)
-        }
-    }
-    b.result()
-  }
+//  def featureNames(c: ARRAY): Seq[String] = {
+//    require(n == c.length)
+//    val b = Seq.newBuilder[String]
+//    var i = 0
+//    val m = mutable.Map.empty[String, Seq[String]]
+//    while (i < n) {
+//      val f = features(i)
+//      val names = f.unsafeFeatureNames(c(i))
+//      b ++= names
+//      val name = f.transformer.name
+//      if (crossings.keys.contains(name)) {
+//        m(name) = names
+//      }
+//      i += 1
+//    }
+//    crossings.map.keys.foreach {
+//      case (n1, n2) =>
+//        for {
+//          x <- m(n1)
+//          y <- m(n2)
+//        } {
+//          b += Crossings.name(x, y)
+//        }
+//    }
+//    b.result()
+//  }
 
   // (Array[Option[A]], Array[Option[C]], FeatureBuilder[F])
-  def featureValues[F](a: ARRAY, c: ARRAY, fb: FeatureBuilder[F]): Unit = {
-    require(n == c.length)
-    fb.init(featureDimension(c))
-    var i = 0
-    while (i < n) {
-      val f = features(i)
-      fb.prepare(f.transformer)
-      f.unsafeBuildFeatures(a(i), c(i), fb)
-      i += 1
-    }
-  }
+//  def featureValues[F](a: ARRAY, c: ARRAY, fb: FeatureBuilder[F]): Unit = {
+//    require(n == c.length)
+//    fb.init(featureDimension(c))
+//    var i = 0
+//    while (i < n) {
+//      val f = features(i)
+//      fb.prepare(f.transformer)
+//      f.unsafeBuildFeatures(a(i), c(i), fb)
+//      i += 1
+//    }
+//  }
 
   // Option[C]
   def featureSettings(c: ARRAY): Seq[Settings] = {

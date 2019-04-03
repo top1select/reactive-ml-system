@@ -13,10 +13,6 @@ import scala.reflect.ClassTag
 @typeclass trait FlatReader[T] extends Serializable {
   def readDouble(name: String): T => Option[Double]
 
-  def readMdlRecord(name: String): T => Option[MDLRecord[String]]
-
-  def readWeightedLabel(name: String): T => Option[List[WeightedLabel]]
-
   def readDoubles(name: String): T => Option[Seq[Double]]
 
   def readDoubleArray(name: String): T => Option[Array[Double]]
@@ -43,7 +39,7 @@ object FlatExtractor {
     * @return Class for converting to Features
     */
   @inline def apply[M[_]: CollectionType, T: ClassTag: FlatReader](
-                                                                    settings: M[String]): FlatExtractor[M, T] = new FlatExtractor[M, T](settings)
+    settings: M[String]): FlatExtractor[M, T] = new FlatExtractor[M, T](settings)
 
   /**
     * Another useful operation is to use the Spec and Information we have to map from
@@ -64,8 +60,8 @@ object FlatExtractor {
   }
 }
 
-private[featran] class FlatExtractor[M[_]: CollectionType, T: ClassTag: FlatReader](
-                                                                                     settings: M[String])
+class FlatExtractor[M[_]: CollectionType, T: ClassTag: FlatReader](
+    settings: M[String])
   extends Serializable {
 
   import json._
