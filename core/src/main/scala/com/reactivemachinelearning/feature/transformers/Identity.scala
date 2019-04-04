@@ -22,7 +22,7 @@ object Identity extends SettingsBuilder {
     Identity(setting.name)
 }
 
-private[featran] class Identity(name: String) extends MapOne[Double](name) {
+class Identity(name: String) extends MapOne[Double](name) {
   override def map(a: Double): Double = a
   override def flatRead[T: FlatReader]: T => Option[Any] = FlatReader[T].readDouble(name)
 

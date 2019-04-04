@@ -195,7 +195,7 @@ object TweetFeatureGeneration extends App {
     val Thresholds = List(47, 92, 141)
 
     private def extract(data: RawData): IntFeature = {
-      IntFeature("tweetLength", data.text.length)
+//      IntFeature("tweetLength", data.text.length)
     }
 
     private def transform(lengthFeature: IntFeature): IntFeature = {

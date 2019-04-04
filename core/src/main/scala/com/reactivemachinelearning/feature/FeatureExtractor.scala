@@ -1,6 +1,7 @@
 package com.reactivemachinelearning.feature
 
 
+import com.reactivemachinelearning.feature.transformers.{Settings, Transformer}
 import scala.reflect.ClassTag
 
 /**
@@ -8,17 +9,16 @@ import scala.reflect.ClassTag
   * @tparam M input collection type, e.g. `Array`, List
   * @tparam T input record type to extract features from
   */
-class FeatureExtractor[M[_]: CollectionType, T] private[featran] (
-                                                                   private val fs: M[FeatureSet[T]],
+class FeatureExtractor[M[_]: CollectionType, T](private val fs: M[FeatureSet[T]],
                                                                    @transient private val input: M[T],
                                                                    @transient private val settings: Option[M[String]])
   extends Serializable {
   import FeatureSpec.ARRAY, CollectionType.ops._, json._
 
-  @transient private[featran] lazy val as: M[(T, ARRAY)] =
+  @transient lazy val as: M[(T, ARRAY)] =
     input.cross(fs).map { case (in, spec) => (in, spec.unsafeGet(in)) }
 
-  @transient private[featran] lazy val aggregate: M[ARRAY] = settings match {
+  @transient lazy val aggregate: M[ARRAY] = settings match {
     case Some(x) =>
       x.cross(fs).map {
         case (s, spec) =>
@@ -108,7 +108,7 @@ object RecordExtractor {
 }
 
 /** Encapsulate [[RecordExtractor]] for extracting individual records. */
-class RecordExtractor[T, F: FeatureBuilder: ClassTag] private[featran] (fs: FeatureSet[T],
+class RecordExtractor[T, F: FeatureBuilder: ClassTag] (fs: FeatureSet[T],
                                                                         settings: String) {
   import RecordExtractor._
 

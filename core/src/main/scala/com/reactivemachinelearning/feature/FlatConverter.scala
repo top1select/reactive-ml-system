@@ -34,7 +34,7 @@ object FlatConverter {
                                                            spec: FeatureSpec[T]): FlatConverter[T, A] = new FlatConverter[T, A](spec)
 }
 
-private[featran] class FlatConverter[T: ClassTag, A: ClassTag: FlatWriter](spec: FeatureSpec[T])
+class FlatConverter[T: ClassTag, A: ClassTag: FlatWriter](spec: FeatureSpec[T])
   extends Serializable {
   import CollectionType.ops._
 

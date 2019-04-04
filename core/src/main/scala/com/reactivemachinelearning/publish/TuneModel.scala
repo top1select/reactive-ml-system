@@ -15,9 +15,9 @@ object TuneModel {
 
   // Build parameter grid
   val paramGrid = new ParamGridBuilder()
-    .addGrid(xgBoostEstimator.maxDepth, Array(4, 7))
-    .addGrid(xgBoostEstimator.eta, Array(0.1, 0.6))
-    .addGrid(xgBoostEstimator.round, Array(5, 10))
+//    .addGrid(xgBoostEstimator.maxDepth, Array(4, 7))
+//    .addGrid(xgBoostEstimator.eta, Array(0.1, 0.6))
+//    .addGrid(xgBoostEstimator.round, Array(5, 10))
     .build()
 
   // Set evaluator as a BinaryClassificationEvaluator
@@ -26,12 +26,12 @@ object TuneModel {
 
   // Establish CrossValidator()
   val cv = new CrossValidator()
-    .setEstimator(xgBoostPipeline)
+//    .setEstimator(xgBoostPipeline)
     .setEvaluator(evaluator)
     .setEstimatorParamMaps(paramGrid)
     .setNumFolds(4)
 
   // Run cross-validation, and choose the best set of parameters.
-  val cvModel = cv.fit(dataset_train)
+//  val cvModel = cv.fit(dataset_train)
 
 }

@@ -1,6 +1,6 @@
 package com.reactivemachinelearning.feature
 
-import com.reactivemachinelearning.feature.transformers.Transformer
+import com.reactivemachinelearning.feature.transformers.{Settings, SettingsBuilder, Transformer}
 import simulacrum.typeclass
 
 import scala.reflect.ClassTag

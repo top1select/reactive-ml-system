@@ -123,13 +123,13 @@ case class Settings(cls: String,
                     featureNames: Seq[String],
                     aggregators: Option[String])
 
-private[featran] abstract class OneDimensional[A, B, C](name: String)
+abstract class OneDimensional[A, B, C](name: String)
   extends Transformer[A, B, C](name) {
   override def featureDimension(c: C): Int = 1
   override def featureNames(c: C): Seq[String] = Seq(name)
 }
 
-private[featran] abstract class MapOne[A](name: String)
+abstract class MapOne[A](name: String)
   extends OneDimensional[A, Unit, Unit](name) {
   override val aggregator: Aggregator[A, Unit, Unit] = Aggregators.unit[A]
   override def buildFeatures(a: Option[A], c: Unit, fb: FeatureBuilder[_]): Unit = a match {

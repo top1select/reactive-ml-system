@@ -11,7 +11,7 @@ import scala.reflect.runtime.universe.TypeTag
   */
 object FeatureSpec {
 
-  private[featran] type ARRAY = Array[Option[Any]]
+  type ARRAY = Array[Option[Any]]
 
   /**
     * Generates a new [[FeatureSpec]] for case class of type `T`.  This method
@@ -66,6 +66,19 @@ class FeatureSpec[T](val features: Array[Feature[T, _, _, _]]){
     * @tparam M input collection type, e.g. Array, List
     * @return
     */
+
+  /**
+    * Add an optional field specification.
+    * @param f function to extract feature `Option[A]` from record `T`
+    * @param default default for missing values
+    * @param t [[transformers.Transformer Transformer]] for extracted feature `A`
+    * @tparam A extracted feature type
+    */
+  def optional[A](f: T => Option[A], default: Option[A] = None)(
+    t: Transformer[A, _, _]): FeatureSpec[T] =
+    new FeatureSpec[T](this.features :+ new Feature(f, default, t))
+
+
   def extract[M[_]: CollectionType](input: M[T]): FeatureExtractor[M, T] = {
 
     import CollectionType.ops._
@@ -184,7 +197,7 @@ private class Feature[T, A, B, C](val f: T => Option[A],
 
 }
 
-private class FeatureSet[T](private[featran] val features: Array[Feature[T, _, _, _]])
+private class FeatureSet[T](val features: Array[Feature[T, _, _, _]])
   extends Serializable {
 
   {

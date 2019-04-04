@@ -30,7 +30,7 @@ object Binarizer extends SettingsBuilder {
   }
 }
 
-private[featran] class Binarizer(name: String, val threshold: Double) extends MapOne[Double](name) {
+class Binarizer(name: String, val threshold: Double) extends MapOne[Double](name) {
   override def map(a: Double): Double = if (a > threshold) 1.0 else 0.0
   override def params: Map[String, String] =
     Map("threshold" -> threshold.toString)

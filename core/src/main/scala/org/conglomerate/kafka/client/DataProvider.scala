@@ -17,7 +17,7 @@ import org.conglomerate.utils.{ModelDescriptor, RawWeatherData}
 import org.slf4j.LoggerFactory
 
 import spray.json._
-import org.conglomerate.utils.MyJsonProtocol._
+//import org.conglomerate.utils.MyJsonProtocol._
 import DefaultJsonProtocol._
 
 /**
