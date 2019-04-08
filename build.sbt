@@ -80,6 +80,12 @@ libraryDependencies ++= Seq(
 
 )
 
+libraryDependencies ++= Seq(
+  "io.circe" %% "circe-core",
+  "io.circe" %% "circe-generic",
+  "io.circe" %% "circe-parser"
+).map(_ % circeVersion)
+
 resolvers += Resolver.bintrayRepo("beyondthelines", "maven")
 
 scalacOptions ++= Seq("-Ypartial-unification")

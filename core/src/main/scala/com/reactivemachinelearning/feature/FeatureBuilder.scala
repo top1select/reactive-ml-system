@@ -160,9 +160,10 @@ case class NamedSparseArray[@specialized(Float, Double) T](indices: Array[Int],
 
 object FeatureBuilder {
 
+
   private final case class ArrayFB[T: ClassTag: FloatingPoint](
-                                                                private var underlying: Array[T] = null)
-    extends FeatureBuilder[Array[T]] {
+    private var underlying: Array[T] = null)
+      extends FeatureBuilder[Array[T]] {
     private var offset: Int = 0
 
     override def init(dimension: Int): Unit = underlying = new Array[T](dimension)
